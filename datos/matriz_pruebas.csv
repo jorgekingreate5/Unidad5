@@ -1,0 +1,15 @@
+﻿id,regla,entrada,resultado_esperado,tipo,prueba,resultado_real,estado
+CP-01,VIP 15%,"Total=200, VIP","cobro 170.00, CONFIRMED",Éxito,test_order.py::test_vip_discount_200,"cobro 170.00, CONFIRMED",OK
+CP-02,Sin descuento regular,"Total=200, regular","cobro 200.00, CONFIRMED",Éxito,test_order.py::test_regular_200_no_discount,"cobro 200.00, CONFIRMED",OK
+CP-03,Pago aprobado (mock),"VIP 200, gateway=True",170.0; charge(170.0),Éxito,test_service.py::test_gateway_approved_vip_200,170.0; charge(170.0),OK
+CP-04,Admin cancela NEW ajeno,"admin, NEW, 100 h",True,Éxito,test_security.py::test_admin_cancels_new_order_of_other_user,True,OK
+CP-05,Commit persiste,"save(2, total 250) + commit","id=2, total=250, status=NEW",Éxito,test_repository.py::test_repository_commit_order_250,Por ejecutar con pytest (requiere SQLAlchemy),Pendiente
+CP-06,Deuda pendiente,"Total=150, deuda=500",CustomerHasDebt: outstanding debt,Error,test_order.py::test_customer_debt / CP03 CSV,CustomerHasDebt: outstanding debt,OK
+CP-07,Confirmar dos veces (TDD),confirm() dos veces,ValueError: already confirmed,Error,test_order.py::test_cannot_confirm_twice,ValueError: already confirmed,OK
+CP-08,Pago rechazado (mock),"VIP 200, gateway=False",RuntimeError: payment rejected; charge(170.0),Error,test_service.py::test_gateway_rejected_vip_200,RuntimeError: payment rejected; charge(170.0),OK
+CP-09,Pedido enviado no se cancela,"SHIPPED, propietario",False,Error,test_security.py::test_shipped_denied_for_owner,False,OK
+CP-10,Propietario a las 24 h exactas,"NEW, 24 h 0 min",False,Límite,test_security.py::test_owner_at_exactly_24h_denied,False,OK
+CP-11,Propietario a 23 h 59 min,"NEW, 23 h 59 min",True,Límite,test_security.py::test_owner_just_under_24h_allowed,True,OK
+CP-12,Total mínimo VIP,"Total=0.01, VIP","cobro 0.01, CONFIRMED",Límite,test_casos_csv.py::CP07,"cobro 0.01, CONFIRMED",OK
+CP-13,Total cero,Total=0,ValueError: total must be positive,Límite,test_order.py::test_invalid_total / CP04,ValueError: total must be positive,OK
+CP-14,Rollback descarta,"save(1, total 120) + rollback",Consulta id=1 devuelve None,Límite,test_repository.py::test_repository_rollback,Por ejecutar con pytest (requiere SQLAlchemy),Pendiente
