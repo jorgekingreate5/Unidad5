@@ -1,0 +1,23 @@
+﻿id,regla,entrada,resultado_esperado,tipo,prueba,resultado_real,estado
+PIA-01,Cancelación ≥48 h sin costo,"Llegada en 72 h, sin excepción",cargo 0.00; CANCELADA,Éxito,test_cancelacion.py::test_cancel_72h_free,cargo 0.00; CANCELADA,OK
+PIA-02,Excepción autorizada,"Llegada en 10 h, Jefe de Reservaciones",cargo 0.00,Éxito,test_cancelacion.py::test_cancel_with_chief_authorization_free,cargo 0.00,OK
+PIA-03,Cargo de 1 noche,"Llegada en 10 h, sin excepción",cargo 1500.00,Éxito,test_cancelacion.py::test_cancel_late_charges_one_night,cargo 1500.00,OK
+PIA-04,Cancelar reserva ya cancelada,Estado CANCELADA,ValueError,Error,test_cancelacion.py::test_cancel_already_cancelled_error,ValueError: reservation cannot be cancelled,OK
+PIA-05,Rol sin autoridad,Autoriza RECEPCION,PermissionError,Error,test_cancelacion.py::test_cancel_unauthorized_role_error,PermissionError: only Jefe de Reservaciones or Administración can authorize,OK
+PIA-06,Límite 48 h exactas,Llegada en 48 h 0 min,cargo 0.00,Límite,test_cancelacion.py::test_cancel_exactly_48h_free,cargo 0.00,OK
+PIA-07,Límite 47 h 59 min,Llegada en 47.99 h,cargo 1500.00,Límite,test_cancelacion.py::test_cancel_47h59_charges,cargo 1500.00,OK
+PIA-08,Consumo dentro del tope,Cargo 1000,saldo=1000,Éxito,test_credito.py::test_charge_1000_ok,saldo=1000,OK
+PIA-09,Consumo sobre el tope,"Cargo 3500, saldo 0",CreditLimitExceeded,Error,test_credito.py::test_charge_over_limit_rejected,CreditLimitExceeded: credit limit exceeded,OK
+PIA-10,Monto inválido,Cargo 0,ValueError,Error,test_credito.py::test_charge_zero_or_negative_error,ValueError: amount must be positive,OK
+PIA-11,"Límite exacto $3,000","Cargo 3000, saldo 0",saldo=3000,Límite,test_credito.py::test_charge_exactly_3000_ok,saldo=3000,OK
+PIA-12,"Límite $3,000.01",Saldo 3000 + cargo 0.01,CreditLimitExceeded,Límite,test_credito.py::test_charge_3000_01_rejected,CreditLimitExceeded: credit limit exceeded,OK
+PIA-13,Autorización de Administración,"Saldo 2900 + cargo 500, autorizado",saldo=3400,Éxito,test_credito.py::test_admin_authorization_allows_excess,saldo=3400,OK
+PIA-14,Pago parcial libera crédito,"Saldo 3000, pago 1000, cargo 500",saldo=2500,Éxito,test_credito.py::test_partial_payment_then_charge,saldo=2500,OK
+PIA-15,Garantía antes de 24 h,Pre-reserva de 23 h,estado=CONFIRMADA,Éxito,test_prereserva.py::test_confirm_at_23h_ok,estado=CONFIRMADA,OK
+PIA-16,Garantía tras expirar,Pre-reserva de 30 h,ValueError; estado=EXPIRADA,Error,test_prereserva.py::test_confirm_after_30h_error,ValueError: only a valid pre-reservation can be confirmed; estado=EXPIRADA,OK
+PIA-17,Límite 24 h exactas,Pre-reserva de 24 h,EXPIRADA,Límite,test_prereserva.py::test_expires_at_exactly_24h,EXPIRADA,OK
+PIA-18,Límite 23 h 59 min,Pre-reserva de 23.98 h,PRE_RESERVA,Límite,test_prereserva.py::test_not_expired_at_23h59,PRE_RESERVA,OK
+PIA-19,Mock: tarjeta aprobada,validador → True,CONFIRMADA,Éxito,test_garantia_mock.py::test_guarantee_approved,CONFIRMADA; estado=CONFIRMADA,OK
+PIA-20,Mock: tarjeta rechazada,validador → False,GuaranteeRejected; estado=PRE_RESERVA,Error,test_garantia_mock.py::test_guarantee_rejected_keeps_pre_reservation,GuaranteeRejected: card rejected; estado=PRE_RESERVA,OK
+PIA-21,Persistencia: commit,save(id=7) + commit,"id=7, 1500.0, CONFIRMADA",Éxito,test_repositorio.py::test_reservation_commit,Por ejecutar con pytest (requiere SQLAlchemy),Pendiente
+PIA-22,Persistencia: rollback,save(id=7) + rollback,get(7) devuelve None,Límite,test_repositorio.py::test_reservation_rollback,Por ejecutar con pytest (requiere SQLAlchemy),Pendiente
